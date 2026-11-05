@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Pesquisa - De Olho na Visão</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+    background: linear-gradient(135deg, #0a1628 0%, #1a2a4a 50%, #0d1b33 100%);
+    min-height: 100vh;
+    color: #e0e0e0;
+    overflow-x: hidden;
+  }
+
+  .header {
+    position: relative;
+    width: 100%;
+    height: 220px;
+    background: url('olho.jpg') center center / cover no-repeat;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+
+  .header::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle at 70% 50%, rgba(0,0,0,0.3) 0%, rgba(0,0,0,0.7) 100%);
+  }
+
+  .header-content {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .header-content h1 {
+    font-size: 2.2em;
+    font-weight: 800;
+    color: #fff;
+    text-shadow: 0 2px 10px rgba(0,0,0,0.5);
+    letter-spacing: -0.5px;
+  }
+
+  .header-content h1 span { color: #f0a500; }
+
+  .header-content p {
+    font-size: 0.85em;
+    color: rgba(255,255,255,0.85);
+    margin-top: 5px;
+    text-shadow: 0 1px 5px rgba(0,0,0,0.5);
+  }
+
+  .container {
+    max-width: 520px;
+    margin: 0 auto;
+    padding: 20px 16px 40px;
+  }
+
+  .contexto {
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(240,165,0,0.3);
+    border-radius: 12px;
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    font-size: 0.82em;
+    color: #b0c4de;
+    line-height: 1.5;
+    text-align: center;
+  }
+
+  .contexto strong { color: #f0a500; }
+
+  .question {
+    background: rgba(255,255,255,0.07);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 16px;
+    padding: 18px;
+    margin-bottom: 16px;
+    transition: transform 0.2s;
+  }
+
+  .question:hover { transform: translateY(-1px); }
+
+  .question-number {
+    display: inline-block;
+    background: linear-gradient(135deg, #f0a500, #d4891a);
+    color: #0a1628;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    text-align: center;
+    line-height: 28px;
+    font-weight: 800;
+    font-size: 0.85em;
+    margin-right: 8px;
+  }
+
+  .question label {
+    display: block;
+    font-weight: 700;
+    font-size: 1em;
+    color: #fff;
+    margin-bottom: 12px;
+    line-height: 1.4;
+  }
+
+  .question label .hint {
+    display: block;
+    font-weight: 400;
+    font-size: 0.78em;
+    color: #8899aa;
+    margin-top: 3px;
+  }
+
+  .btn-option {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    padding: 13px 16px;
+    margin: 6px 0;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    background: rgba(255,255,255,0.04);
+    color: #c0d0e0;
+    font-size: 0.95em;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    text-align: left;
+    gap: 10px;
+  }
+
+  .btn-option:hover {
+    border-color: rgba(240,165,0,0.5);
+    background: rgba(240,165,0,0.08);
+    color: #fff;
+  }
+
+  .btn-option.selected {
+    border-color: #f0a500;
+    background: rgba(240,165,0,0.15);
+    color: #fff;
+    font-weight: 600;
+    box-shadow: 0 0 15px rgba(240,165,0,0.2);
+  }
+
+  .btn-option .check-icon {
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 2px solid rgba(255,255,255,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    font-size: 12px;
+    transition: all 0.25s;
+  }
+
+  .btn-option.selected .check-icon {
+    background: #f0a500;
+    border-color: #f0a500;
+    color: #0a1628;
+  }
+
+  .rating-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 5px;
+  }
+
+  .rating-btn {
+    flex: 1;
+    padding: 14px 0;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 12px;
+    background: rgba(255,255,255,0.04);
+    color: #8899aa;
+    font-size: 1.1em;
+    font-weight: 700;
+    cursor: pointer;
+    text-align: center;
+    transition: all 0.25s;
+  }
+
+  .rating-btn:hover {
+    border-color: rgba(240,165,0,0.5);
+    color: #fff;
+  }
+
+  .rating-btn.selected {
+    background: linear-gradient(135deg, #f0a500, #d4891a);
+    border-color: #f0a500;
+    color: #0a1628;
+    box-shadow: 0 4px 15px rgba(240,165,0,0.3);
+    transform: scale(1.05);
+  }
+
+  .rating-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 6px;
+    font-size: 0.7em;
+    color: #667788;
+  }
+
+  .text-input {
+    width: 100%;
+    padding: 12px 14px;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.2);
+    color: #fff;
+    font-size: 0.95em;
+    font-family: inherit;
+    transition: border-color 0.25s;
+    resize: vertical;
+  }
+
+  .text-input:focus {
+    outline: none;
+    border-color: #f0a500;
+    background: rgba(0,0,0,0.3);
+  }
+
+  .text-input::placeholder { color: #556677; }
+
+  .outro-field {
+    margin-top: 8px;
+    display: none;
+  }
+
+  .outro-field.visible { display: block; }
+
+  .submit-btn {
+    width: 100%;
+    padding: 16px;
+    background: linear-gradient(135deg, #f0a500 0%, #d4891a 100%);
+    color: #0a1628;
+    border: none;
+    border-radius: 14px;
+    font-size: 1.1em;
+    font-weight: 800;
+    cursor: pointer;
+    margin-top: 10px;
+    letter-spacing: 0.5px;
+    transition: all 0.3s;
+    box-shadow: 0 4px 20px rgba(240,165,0,0.3);
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 25px rgba(240,165,0,0.4);
+  }
+
+  .submit-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .success-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 20px;
+    animation: fadeIn 0.5s ease;
+  }
+
+  .success-screen.visible { display: block; }
+
+  .success-icon {
+    font-size: 4em;
+    margin-bottom: 15px;
+    animation: bounce 0.6s ease;
+  }
+
+  .success-screen h2 {
+    color: #f0a500;
+    font-size: 1.6em;
+    margin-bottom: 10px;
+  }
+
+  .success-screen p {
+    color: #8899aa;
+    font-size: 1em;
+    margin-bottom: 30px;
+  }
+
+  .next-btn {
+    padding: 14px 40px;
+    background: linear-gradient(135deg, #f0a500, #d4891a);
+    color: #0a1628;
+    border: none;
+    border-radius: 12px;
+    font-size: 1.05em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s;
+  }
+
+  .next-btn:hover { transform: scale(1.05); }
+
+  .cloud-status {
+    text-align: center;
+    margin-top: 20px;
+    padding: 10px;
+    background: rgba(22, 163, 74, 0.1);
+    border: 1px solid rgba(22, 163, 74, 0.3);
+    border-radius: 8px;
+    font-size: 0.8em;
+    color: #16a34a;
+  }
+
+  .cloud-status.offline {
+    background: rgba(220, 53, 69, 0.1);
+    border-color: rgba(220, 53, 69, 0.3);
+    color: #dc3545;
+  }
+
+  .footer-info {
+    text-align: center;
+    margin-top: 30px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255,255,255,0.08);
+    font-size: 0.75em;
+    color: #445566;
+  }
+
+  .admin-section {
+    margin-top: 60px;
+    padding-top: 20px;
+    border-top: 2px dashed rgba(255,255,255,0.06);
+    text-align: center;
+  }
+
+  .admin-label {
+    font-size: 0.7em;
+    color: #334455;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 10px;
+  }
+
+  .admin-btn {
+    display: inline-block;
+    padding: 8px 16px;
+    background: transparent;
+    color: #445566;
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.75em;
+    transition: all 0.2s;
+  }
+
+  .admin-btn:hover {
+    color: #dc3545;
+    border-color: rgba(220, 53, 69, 0.3);
+    background: rgba(220, 53, 69, 0.05);
+  }
+
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    backdrop-filter: blur(8px);
+    z-index: 1000;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+  }
+
+  .modal-overlay.visible { display: flex; }
+
+  .modal {
+    background: linear-gradient(135deg, #1a2a4a, #0d1b33);
+    border: 1px solid rgba(220, 53, 69, 0.3);
+    border-radius: 16px;
+    padding: 30px 25px;
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  }
+
+  .modal-icon { font-size: 3em; margin-bottom: 10px; }
+
+  .modal h3 {
+    color: #dc3545;
+    font-size: 1.3em;
+    margin-bottom: 10px;
+  }
+
+  .modal p {
+    color: #8899aa;
+    font-size: 0.9em;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .modal .warning-text {
+    color: #f0a500;
+    font-size: 0.85em;
+    margin-bottom: 20px;
+    padding: 10px;
+    background: rgba(240,165,0,0.1);
+    border-radius: 8px;
+    border: 1px solid rgba(240,165,0,0.2);
+  }
+
+  .modal-input {
+    width: 100%;
+    padding: 14px;
+    border: 2px solid rgba(255,255,255,0.12);
+    border-radius: 10px;
+    background: rgba(0,0,0,0.3);
+    color: #fff;
+    font-size: 1.1em;
+    text-align: center;
+    letter-spacing: 3px;
+    font-weight: 700;
+    margin-bottom: 15px;
+    transition: border-color 0.25s;
+  }
+
+  .modal-input:focus {
+    outline: none;
+    border-color: #dc3545;
+  }
+
+  .modal-input::placeholder {
+    letter-spacing: 1px;
+    font-weight: 400;
+    color: #556677;
+  }
+
+  .modal-input.error {
+    border-color: #dc3545;
+    animation: shake 0.4s ease;
+  }
+
+  .modal-buttons {
+    display: flex;
+    gap: 10px;
+  }
+
+  .modal-btn {
+    flex: 1;
+    padding: 12px;
+    border: none;
+    border-radius: 10px;
+    font-size: 0.95em;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+
+  .modal-btn.cancel {
+    background: rgba(255,255,255,0.1);
+    color: #8899aa;
+  }
+
+  .modal-btn.cancel:hover {
+    background: rgba(255,255,255,0.15);
+    color: #fff;
+  }
+
+  .modal-btn.confirm {
+    background: linear-gradient(135deg, #dc3545, #c82333);
+    color: #fff;
+  }
+
+  .modal-btn.confirm:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(220, 53, 69, 0.4);
+  }
+
+  .modal-btn.confirm:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .error-msg {
+    color: #dc3545;
+    font-size: 0.8em;
+    margin-top: -10px;
+    margin-bottom: 10px;
+    display: none;
+  }
+
+  .error-msg.visible { display: block; }
+
+  /* Loading spinner */
+  .spinner {
+    display: inline-block;
+    width: 18px;
+    height: 18px;
+    border: 3px solid rgba(10, 22, 40, 0.3);
+    border-top-color: #0a1628;
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
+    vertical-align: middle;
+    margin-right: 8px;
+  }
+
+  @keyframes spin { to { transform: rotate(360deg); } }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes bounce {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-8px); }
+    75% { transform: translateX(8px); }
+  }
+
+  .question { animation: fadeIn 0.4s ease backwards; }
+  .question:nth-child(2) { animation-delay: 0.1s; }
+  .question:nth-child(3) { animation-delay: 0.2s; }
+  .question:nth-child(4) { animation-delay: 0.3s; }
+  .question:nth-child(5) { animation-delay: 0.4s; }
+  .question:nth-child(6) { animation-delay: 0.5s; }
+
+  @media (max-width: 380px) {
+    .header { height: 180px; }
+    .header-content h1 { font-size: 1.8em; }
+    .rating-btn { padding: 12px 0; font-size: 1em; }
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="header-content">
+    <h1>De <span>olho</span> na visão</h1>
+    <p>Cuide bem da sua visão</p>
+  </div>
+</div>
+
+<div class="container" id="form-container">
+  
+  <div class="contexto">
+    Você participou da Ação <strong>"De olho na visão"</strong> como parte da UC de Saúde Visual da <strong>Turma de Técnico em Ótica 2/2025 do SENAC-RJ</strong>
+  </div>
+
+  <div class="question">
+    <label><span class="question-number">1</span> Como você avalia esta ação?</label>
+    <div class="rating-container">
+      <div class="rating-btn" onclick="selectRating(1)">1</div>
+      <div class="rating-btn" onclick="selectRating(2)">2</div>
+      <div class="rating-btn" onclick="selectRating(3)">3</div>
+      <div class="rating-btn" onclick="selectRating(4)">4</div>
+      <div class="rating-btn" onclick="selectRating(5)">5</div>
+    </div>
+    <div class="rating-labels">
+      <span>Péssimo</span><span>Ruim</span><span>Regular</span><span>Bom</span><span>Excelente</span>
+    </div>
+    <input type="hidden" id="avaliacao">
+  </div>
+
+  <div class="question">
+    <label><span class="question-number">2</span> O que você mais gostou? <span class="hint">Marque até 2 opções</span></label>
+    <button class="btn-option" onclick="toggleMulti(this, 'gostou', 2)">
+      <span class="check-icon"></span> Rapidez no atendimento
+    </button>
+    <button class="btn-option" onclick="toggleMulti(this, 'gostou', 2)">
+      <span class="check-icon"></span> Simpatia da equipe
+    </button>
+    <button class="btn-option" onclick="toggleMulti(this, 'gostou', 2)">
+      <span class="check-icon"></span> Local / Organização
+    </button>
+    <button class="btn-option" onclick="toggleMulti(this, 'gostou', 2)">
+      <span class="check-icon"></span> Gratuidade / Acesso
+    </button>
+    <input type="hidden" id="gostou">
+  </div>
+
+  <div class="question">
+    <label><span class="question-number">3</span> Como você ficou sabendo da nossa ação?</label>
+    <button class="btn-option" onclick="selectSingle(this, 'divulgacao', null)">
+      <span class="check-icon"></span> Colega de turma
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'divulgacao', null)">
+      <span class="check-icon"></span> Cartaz nos painéis dos corredores
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'divulgacao', null)">
+      <span class="check-icon"></span> Aviso da coordenação
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'divulgacao', null)">
+      <span class="check-icon"></span> Convite da turma na sala de aula
+    </button>
+    <button class="btn-option" onclick="selectOutro(this, 'divulgacao', 'outro-divulgacao')">
+      <span class="check-icon"></span> Outro
+    </button>
+    <div class="outro-field" id="outro-divulgacao">
+      <input type="text" class="text-input" id="outro-divulgacao-text" placeholder="Descreva aqui...">
+    </div>
+    <input type="hidden" id="divulgacao">
+  </div>
+
+  <div class="question">
+    <label><span class="question-number">4</span> O que podemos melhorar?</label>
+    <button class="btn-option" onclick="selectSingle(this, 'melhorar', null)">
+      <span class="check-icon"></span> Tempo de espera
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'melhorar', null)">
+      <span class="check-icon"></span> Sinalização / Local
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'melhorar', null)">
+      <span class="check-icon"></span> Divulgação
+    </button>
+    <button class="btn-option" onclick="selectSingle(this, 'melhorar', null)">
+      <span class="check-icon"></span> Atendimento
+    </button>
+    <button class="btn-option" onclick="selectOutro(this, 'melhorar', 'outro-melhorar')">
+      <span class="check-icon"></span> Outro
+    </button>
+    <div class="outro-field" id="outro-melhorar">
+      <input type="text" class="text-input" id="outro-melhorar-text" placeholder="Descreva aqui...">
+    </div>
+    <input type="hidden" id="melhorar">
+  </div>
+
+  <div class="question">
+    <label><span class="question-number">5</span> Deixe um recado ou sugestão <span class="hint">Opcional</span></label>
+    <textarea class="text-input" id="sugestao" rows="3" placeholder="Ex: Adorei a iniciativa, parabéns à turma!"></textarea>
+  </div>
+
+  <button class="submit-btn" id="submit-btn" onclick="submitForm()">ENVIAR AVALIAÇÃO ✨</button>
+
+  <!-- STATUS DA CONEXÃO COM A NUVEM -->
+  <div class="cloud-status" id="cloud-status">
+    🌐 Conectado à nuvem (Google Sheets)
+  </div>
+
+  <div class="footer-info">
+    Respostas enviadas nesta sessão: <strong id="count">0</strong>
+  </div>
+
+  <div class="admin-section">
+    <div class="admin-label">Área administrativa</div>
+    <button class="admin-btn" onclick="openResetModal()">🗑️ Limpar contador local</button>
+  </div>
+</div>
+
+<div class="container">
+  <div class="success-screen" id="success-screen">
+    <div class="success-icon">👁️✨</div>
+    <h2>Obrigado!</h2>
+    <p>Sua avaliação foi enviada para a nuvem.<br>Sua opinião faz toda a diferença!</p>
+    <button class="next-btn" onclick="resetForm()">Próxima Pessoa ➡️</button>
+  </div>
+</div>
+
+<!-- MODAL DE CONFIRMAÇÃO -->
+<div class="modal-overlay" id="reset-modal">
+  <div class="modal">
+    <div class="modal-icon">⚠️</div>
+    <h3>Limpar contador local?</h3>
+    <p>Isso apenas zera o contador exibido neste dispositivo. Os dados na planilha do Google <strong>NÃO</strong> serão afetados.</p>
+    <div class="warning-text">
+      💡 Os dados reais estão seguros na sua planilha do Google Sheets.
+    </div>
+    <p style="font-size: 0.85em; margin-bottom: 10px;">Digite a palavra de segurança:</p>
+    <input 
+      type="text" 
+      class="modal-input" 
+      id="password-input" 
+      placeholder="Digite: LIMPAR"
+      autocomplete="off"
+      oninput="checkPassword()"
+    >
+    <div class="error-msg" id="error-msg">Palavra incorreta.</div>
+    <div class="modal-buttons">
+      <button class="modal-btn cancel" onclick="closeResetModal()">Cancelar</button>
+      <button class="modal-btn confirm" id="confirm-btn" onclick="confirmReset()" disabled>Confirmar</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // ⚠️ SUBSTITUA PELA SUA URL DO GOOGLE APPS SCRIPT
+  const API_URL = 'https://script.google.com/macros/s/AKfycbz1cX0TiknfwNb_a62mKnTeMS2Pht-HMQaQNuiWp0lMkDyD6-47lVipiTi4uWylYW04LA/exec';
+  const RESET_PASSWORD = 'LIMPAR';
+  
+  let sessionCount = 0;
+  let pendingQueue = []; // Fila para offline
+  let isOnline = true;
+
+  // Verifica conexão com a API ao carregar
+  checkCloudConnection();
+
+  function checkCloudConnection() {
+    const statusEl = document.getElementById('cloud-status');
+    
+    fetch(API_URL, { method: 'GET' })
+      .then(res => {
+        if (res.ok) {
+          isOnline = true;
+          statusEl.innerHTML = '🌐 Conectado à nuvem (Google Sheets)';
+          statusEl.classList.remove('offline');
+          processPendingQueue();
+        } else {
+          setOffline(statusEl);
+        }
+      })
+      .catch(() => setOffline(statusEl));
+  }
+
+  function setOffline(statusEl) {
+    isOnline = false;
+    statusEl.innerHTML = '⚠️ Sem conexão — dados serão enviados quando reconectar';
+    statusEl.classList.add('offline');
+  }
+
+  function selectRating(val) {
+    let buttons = document.querySelectorAll('.rating-btn');
+    buttons.forEach(b => b.classList.remove('selected'));
+    buttons[val-1].classList.add('selected');
+    document.getElementById('avaliacao').value = val;
+  }
+
+  function toggleMulti(btn, fieldId, max) {
+    let parent = btn.parentElement;
+    let selected = parent.querySelectorAll('.btn-option.selected');
+    
+    if (btn.classList.contains('selected')) {
+      btn.classList.remove('selected');
+      btn.querySelector('.check-icon').innerText = '';
+    } else {
+      if (selected.length >= max) {
+        let first = parent.querySelector('.btn-option.selected');
+        first.classList.remove('selected');
+        first.querySelector('.check-icon').innerText = '';
+      }
+      btn.classList.add('selected');
+      btn.querySelector('.check-icon').innerText = '✓';
+    }
+    
+    let values = [];
+    parent.querySelectorAll('.btn-option.selected').forEach(b => {
+      values.push(b.innerText.trim());
+    });
+    document.getElementById(fieldId).value = values.join(' | ');
+  }
+
+  function selectSingle(btn, fieldId, outroContainerId) {
+    let parent = btn.parentElement;
+    let buttons = parent.querySelectorAll('.btn-option');
+    buttons.forEach(b => {
+      b.classList.remove('selected');
+      let icon = b.querySelector('.check-icon');
+      if (icon) icon.innerText = '';
+    });
+    btn.classList.add('selected');
+    btn.querySelector('.check-icon').innerText = '✓';
+    document.getElementById(fieldId).value = btn.innerText.trim();
+    
+    if (outroContainerId) {
+      document.getElementById(outroContainerId).classList.remove('visible');
+    }
+  }
+
+  function selectOutro(btn, fieldId, outroContainerId) {
+    selectSingle(btn, fieldId, outroContainerId);
+    if (outroContainerId) {
+      document.getElementById(outroContainerId).classList.add('visible');
+      document.getElementById(outroContainerId + '-text').focus();
+    }
+  }
+
+  async function submitForm() {
+    let avaliacao = document.getElementById('avaliacao').value;
+    let gostou = document.getElementById('gostou').value;
+    let divulgacao = document.getElementById('divulgacao').value;
+    let melhorar = document.getElementById('melhorar').value;
+    let outroDivulgacao = document.getElementById('outro-divulgacao-text').value;
+    let outroMelhorar = document.getElementById('outro-melhorar-text').value;
+    let sugestao = document.getElementById('sugestao').value;
+
+    if (!avaliacao) { alert('Por favor, dê uma nota de 1 a 5.'); return; }
+    if (!gostou) { alert('Por favor, marque pelo menos 1 opção do que você mais gostou.'); return; }
+    if (!divulgacao) { alert('Por favor, informe como ficou sabendo da ação.'); return; }
+    if (!melhorar) { alert('Por favor, indique o que podemos melhorar.'); return; }
+
+    if (divulgacao === 'Outro' && outroDivulgacao.trim()) {
+      divulgacao = 'Outro: ' + outroDivulgacao.trim();
+    }
+    if (melhorar === 'Outro' && outroMelhorar.trim()) {
+      melhorar = 'Outro: ' + outroMelhorar.trim();
+    }
+
+    let response = {
+      data: new Date().toLocaleString('pt-BR'),
+      avaliacao: avaliacao,
+      gostou: gostou,
+      divulgacao: divulgacao,
+      melhorar: melhorar,
+      sugestao: sugestao
+    };
+
+    // Desabilita botão durante envio
+    let submitBtn = document.getElementById('submit-btn');
+    submitBtn.disabled = true;
+    submitBtn.innerHTML = '<span class="spinner"></span>Enviando...';
+
+    // Tenta enviar para a nuvem
+    try {
+      await fetch(API_URL, {
+        method: 'POST',
+        mode: 'no-cors', // Necessário para Google Apps Script
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(response)
+      });
+      
+      // Com no-cors não conseguimos ler a resposta, mas assumimos sucesso
+      sessionCount++;
+      document.getElementById('count').innerText = sessionCount;
+      
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('success-screen').classList.add('visible');
+      
+    } catch (error) {
+      // Se falhar, salva na fila para enviar depois
+      pendingQueue.push(response);
+      alert('⚠️ Sem conexão no momento. A resposta foi salva e será enviada automaticamente quando a internet voltar.');
+      
+      document.getElementById('form-container').style.display = 'none';
+      document.getElementById('success-screen').classList.add('visible');
+    } finally {
+      submitBtn.disabled = false;
+      submitBtn.innerHTML = 'ENVIAR AVALIAÇÃO ✨';
+    }
+  }
+
+  // Processa fila pendente quando reconectar
+  async function processPendingQueue() {
+    while (pendingQueue.length > 0) {
+      let data = pendingQueue.shift();
+      try {
+        await fetch(API_URL, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        sessionCount++;
+        document.getElementById('count').innerText = sessionCount;
+      } catch (e) {
+        pendingQueue.unshift(data); // Retorna para o início da fila
+        break;
+      }
+    }
+  }
+
+  function resetForm() {
+    document.getElementById('form-container').style.display = 'block';
+    document.getElementById('success-screen').classList.remove('visible');
+
+    document.querySelectorAll('.rating-btn').forEach(b => b.classList.remove('selected'));
+    document.getElementById('avaliacao').value = '';
+
+    document.querySelectorAll('.btn-option').forEach(b => {
+      b.classList.remove('selected');
+      let icon = b.querySelector('.check-icon');
+      if (icon) icon.innerText = '';
+    });
+    document.getElementById('gostou').value = '';
+    document.getElementById('divulgacao').value = '';
+    document.getElementById('melhorar').value = '';
+    document.getElementById('outro-divulgacao').classList.remove('visible');
+    document.getElementById('outro-divulgacao-text').value = '';
+    document.getElementById('outro-melhorar').classList.remove('visible');
+    document.getElementById('outro-melhorar-text').value = '';
+    document.getElementById('sugestao').value = '';
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Funções do modal
+  function openResetModal() {
+    document.getElementById('reset-modal').classList.add('visible');
+    document.getElementById('password-input').value = '';
+    document.getElementById('error-msg').classList.remove('visible');
+    document.getElementById('confirm-btn').disabled = true;
+    setTimeout(() => document.getElementById('password-input').focus(), 100);
+  }
+
+  function closeResetModal() {
+    document.getElementById('reset-modal').classList.remove('visible');
+  }
+
+  function checkPassword() {
+    let input = document.getElementById('password-input').value.toUpperCase().trim();
+    let confirmBtn = document.getElementById('confirm-btn');
+    let errorMsg = document.getElementById('error-msg');
+    let passwordInput = document.getElementById('password-input');
+    
+    if (input === RESET_PASSWORD) {
+      confirmBtn.disabled = false;
+      errorMsg.classList.remove('visible');
+      passwordInput.classList.remove('error');
+    } else {
+      confirmBtn.disabled = true;
+    }
+  }
+
+  function confirmReset() {
+    let input = document.getElementById('password-input').value.toUpperCase().trim();
+    
+    if (input !== RESET_PASSWORD) {
+      document.getElementById('error-msg').classList.add('visible');
+      document.getElementById('password-input').classList.add('error');
+      return;
+    }
+
+    sessionCount = 0;
+    document.getElementById('count').innerText = '0';
+    closeResetModal();
+    alert('✅ Contador local zerado. Os dados na planilha do Google permanecem intactos.');
+  }
+
+  document.getElementById('reset-modal').addEventListener('click', function(e) {
+    if (e.target === this) closeResetModal();
+  });
+
+  document.getElementById('password-input').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter' && !document.getElementById('confirm-btn').disabled) {
+      confirmReset();
+    }
+  });
+
+  // Monitora reconexão de internet
+  window.addEventListener('online', () => {
+    const statusEl = document.getElementById('cloud-status');
+    statusEl.innerHTML = '🔄 Reconectando...';
+    statusEl.classList.remove('offline');
+    checkCloudConnection();
+  });
+
+  window.addEventListener('offline', () => {
+    setOffline(document.getElementById('cloud-status'));
+  });
+</script>
+
+</body>
+</html>
